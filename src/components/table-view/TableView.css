@@ -1,0 +1,55 @@
+.table-responsive-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-width: 0;
+}
+
+/* Constrain the MRT paper within container */
+.table-responsive-container .MuiPaper-root {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Table scroll container - fill remaining space */
+.table-responsive-container .MuiTableContainer-root {
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* Ensure table fits within container */
+.table-responsive-container table {
+    table-layout: fixed;
+    width: 100% !important;
+}
+
+/* Cells should truncate with ellipsis when too narrow */
+.table-responsive-container td,
+.table-responsive-container th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sticky header cells stay on top during scroll */
+.table-responsive-container thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 3 !important;
+}
+
+/* Alternating rows */
+.table-responsive-container tbody tr:nth-child(even) {
+    background-color: #fafcff;
+}

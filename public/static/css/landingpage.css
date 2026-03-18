@@ -1,0 +1,155 @@
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: Arial;    
+    font-weight: bold; 
+    padding: 0;
+    margin: 0;
+} 
+
+/* title styling */
+#title-bar {
+    width: 100%;
+    height: 5vh;
+    background-color: #505254;
+    text-align: center;
+    color: white;
+    display: flex;
+    align-items: center; 
+}
+
+#title-text {
+    font-size: 14px;
+    font-family: Arial;    
+    font-weight: bold;
+    text-align: center;
+    color: white;
+} 
+
+/*Tool tip settings */
+/* tooltip {
+    position: fixed;
+    background: #fff;
+    color: #333;
+    border: 2px solid #333;
+    font-size: 15px;
+} */
+
+/* General styling for the tree container */
+.tree {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+/* Base styling for layers */
+.layer {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    height: 95vh;
+    border-right: 1px solid #c5c0c0;
+    justify-content: center;
+    text-align: center; 
+    font-size: 9px;
+    font-family: Arial;    
+    /* font-weight: bold;          */
+
+}
+
+/* Unique styles for each layer */
+.layer-depth-0 {
+    background-color: #fff; 
+    width: 90px;
+}
+
+.layer-depth-1 {
+    background-color: #fff; 
+    width: 80px; 
+}
+
+.layer-depth-2 {
+    background-color: #fff;  
+    width: 50px;
+}
+
+.layer-depth-3 {
+    background-color: #fff; 
+}
+/* Styling for tree nodes */
+.node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Add this line to center the content vertically */
+    text-align: center; /* Add this line to center the content horizontally */
+    cursor: pointer;
+    width: 100%;
+    height: 100%;            
+}
+
+/* Styling for tree nodes */
+.nodeThree {  
+    display: flex;
+    width: 100%;
+    height: 10%;  
+    align-items: center;
+    justify-content: center; /* Add this line to center the content vertically */
+    text-align: center; /* Add this line to center the content horizontally */ 
+    padding:0px;
+    font-size: 10px;
+    font-family: Arial;    
+    font-weight: bold;                                
+}      
+
+.nodeThree.selected {
+    background-color: #d3f4ff; /* Light blue background for selected nodes */
+    border-radius: 5px;
+}    
+
+
+.node img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.node img:hover {
+    transform: scale(1.2);
+}
+
+.node span { 
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Add this to your existing CSS */
+.node.selected {
+    background-color: #d3f4ff; /* Light blue background for selected nodes */
+    border-radius: 5px;
+}        
+
+/* Styling for the title bar */
+#logo {
+    width: 20px; 
+    height: 25px; 
+    padding-right: 10px;
+    padding-left: 20px;
+}
+
+#landingpage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 95vh;
+    width: 100%;
+    background-color: #f0f0f0;
+    font-family: Arial;    
+    font-weight: bold; 
+    font-size: 10px;        
+}

@@ -1,0 +1,5 @@
+images:
+  51785-edms-nature-risk:
+    imagePath: edms-docker/edms-nature-risk
+    version: imageTags
+    promote: true

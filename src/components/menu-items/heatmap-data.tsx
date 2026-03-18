@@ -1,0 +1,147 @@
+export interface HeatmapDataItem {
+    category: 'PRESSURES' | 'DEPENDENCIES';
+    label: string;
+    subLabel: string;
+    riskCategories: string[];
+    companies: string[];
+    values: { [key: string]: number[] };
+}
+
+export const HeatmapData: HeatmapDataItem[] = [
+    {
+        category: 'PRESSURES',
+        label: 'Client View: Nature Risk Pressures Heatmap Across Top 20 Entities',
+        subLabel: 'High pressure on land use change and localized pressures in freshwater use and disturbances',
+        riskCategories: [
+            'max',
+            'Area of rare/hs sites',
+            'Area of land use',
+            'Area of acohol use',
+            'Deforestion (5 more farm)',
+            'Emissions of gren-hsge pollutants',
+            'Emissions of fresh water / nutrients',
+            'Emissions of toxic air and water / pollution',
+            'Operation self major of land water',
+            'Introduction of invasive species',
+            'Other biotic resources extraction',
+            'Other related resources extraction (to resh terrain)',
+            'Very land or water use'
+        ],
+        companies: [
+            'GLENCORE GROUP',
+            'Alumbrera',
+            'Antamina',
+            'Alcorn East',
+            'Beil',
+            'Bulga Complex',
+            'Cerrejon',
+            'Clermont',
+            'Collahuasi',
+            'Collinsville',
+            'Cumnock',
+            'Goedgevonden',
+            'Graspan',
+            'Hail Creek',
+            'Home Smelter',
+            'Hunter Valley Operations',
+            'Izimbiba',
+            'Kamoto',
+            'Kamoto SX-EW',
+            'Kaziac Consolidated',
+            'KCY'
+        ],
+        values: {
+            'GLENCORE GROUP': [0.5, 0.8, 0.8, 0, 0.7, 0.8, 0, 0, 0.1, 0, 0.5, 0, 0.4],
+            'Alumbrera': [1, 1, 0.8, 0, 1, 0.6, 0, 0, 0, 0, 0.9, 0, 0],
+            'Antamina': [1, 1, 0.8, 0, 0.7, 0.8, 0, 0, 0, 0, 0.9, 0, 0.9],
+            'Alcorn East': [1, 1, 0.8, 0, 0.7, 0.8, 0, 0, 0, 0, 0.9, 0, 0.9],
+            'Beil': [1, 1, 0.8, 0, 0.7, 0.7, 0, 0, 0, 0, 0.9, 0, 0.9],
+            'Bulga Complex': [1, 1, 0.8, 0, 0.6, 0.7, 0, 0, 0, 0, 0.9, 0, 0.6],
+            'Cerrejon': [1, 1, 0.8, 0, 0.6, 0.7, 0, 0, 0, 0, 0.9, 0, 0.4],
+            'Clermont': [1, 1, 0.8, 0, 0.2, 0.7, 0, 0, 0, 0, 0.9, 0, 0.5],
+            'Collahuasi': [1, 1, 0.8, 0, 0.6, 0, 0, 0, 0, 0, 0.9, 0, 0.9],
+            'Collinsville': [1, 1, 0.8, 0, 0.5, 0.7, 0, 0, 0, 0, 0.9, 0, 0.9],
+            'Cumnock': [1, 1, 0.8, 0.5, 0.6, 0.8, 0, 0, 0.7, 0, 0.9, 0, 0.6],
+            'Goedgevonden': [1, 1, 0.8, 0, 0.6, 0.7, 0, 0, 0, 0, 0.9, 0, 0.8],
+            'Graspan': [1, 1, 0.8, 0, 0.7, 0.7, 0, 0, 0, 0, 0.9, 0, 0.8],
+            'Hail Creek': [1, 1, 0.8, 0, 0.5, 0.7, 0, 0, 0, 0, 0.9, 0, 0],
+            'Home Smelter': [1, 1, 0.8, 0, 0.7, 0.8, 0, 0, 0, 0, 0.9, 0, 0.4],
+            'Hunter Valley Operations': [1, 1, 0.8, 0, 0.4, 0.7, 0, 0, 0, 0, 1, 0, 0.6],
+            'Izimbiba': [1, 1, 0.8, 0, 0.7, 0.7, 0, 0, 0, 0, 0.9, 0, 0.8],
+            'Kamoto': [1, 1, 0.8, 0, 1, 0.8, 0, 0, 0, 0, 0.9, 0, 0],
+            'Kamoto SX-EW': [1, 1, 0.8, 0, 1, 0.8, 0, 0, 0, 0, 0.9, 0, 0],
+            'Kaziac Consolidated': [1, 1, 0.8, 0, 1, 0.8, 0, 0, 0, 0, 0.9, 0, 0.4],
+            'KCY': [1, 1, 0.8, 0, 1, 0.8, 0, 0, 0, 0, 0.9, 0, 0]
+        }
+    },
+    {
+        category: 'DEPENDENCIES',
+        label: 'Client View: Nature Risk Dependencies Heatmap Across Top 20 Entities',
+        subLabel: 'High dependencies on water purification, water supply and soil waste remediation',
+        riskCategories: [
+            'max',
+            'Animals reared and energy',
+            'Biomass provisioning',
+            'Genetic material',
+            'Water supply',
+            'Air filtration',
+            'Biological control',
+            'Dilution',
+            'Flood control',
+            'Global climate regulation',
+            'Local (micro and meso) climate regulation',
+            'Mediation',
+            'Nursery population and habitat maintenance',
+            'Pollination',
+            'Rainfall pattern regulation',
+            'Soil and sediment retention',
+            'Soil quality regulation',
+            'Solid waste remediation',
+            'Storm mitigation',
+            'Water (new) regulation',
+            'Water purification'
+        ],
+        companies: [
+            'GLENCORE GROUP',
+            'Alumbrera',
+            'Alcorn East',
+            'Bokamoso Pellet Plant',
+            'Bulga',
+            'Collahuasi SX-EW',
+            'Fortuna de Cobre/Lomas II',
+            'Graspan',
+            'Kamoto',
+            'Kamoto SX-EW',
+            'KOF',
+            'KOV',
+            'Kroondal',
+            'Lakeside',
+            'Leeuwfontein',
+            'Leverettrust',
+            'McArthur River',
+            'Phoenix',
+            'Ravensworth'
+        ],
+        values: {
+            'GLENCORE GROUP': [0.6, 0.1, 0.6, 0, 0.5, 0.3, 0, 0.6, 0.5, 0.5, 0.3, 0.1, 0.1, 0, 0, 0.5, 0.2, 0, 0.1, 0.4, 0.6, 0.4],
+            'Alumbrera': [1, 0.6, 0.6, 0, 0.7, 0, 0, 0.1, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0, 0, 0.1, 0.8, 0.6, 0.5],
+            'Alcorn East': [1, 0, 0.6, 0, 0.8, 0.4, 0, 0.8, 0.9, 0.9, 0.6, 0.1, 0, 0, 0, 0.4, 0, 0, 0, 0.8, 0.6, 0],
+            'Bokamoso Pellet Plant': [1, 0, 0.6, 0, 0.9, 0.4, 0, 0.9, 0.8, 0.8, 0.6, 0.6, 0.4, 0, 0, 1, 0.4, 0, 0.6, 0.7, 0.6, 0],
+            'Bulga': [1, 0, 0.6, 0, 0.6, 0.4, 0, 0, 0.9, 0.9, 0.6, 0.1, 0.1, 0, 0, 1, 0, 0, 0.2, 0.8, 0.9, 0],
+            'Collahuasi SX-EW': [1, 0, 0.6, 0, 0.9, 0, 0, 0, 0.9, 0.9, 0.6, 0, 0, 0, 0, 0, 0, 0, 0, 0.8, 0.9, 0],
+            'Fortuna de Cobre/Lomas II': [1, 0.4, 0.4, 0, 0.7, 0.2, 0, 0.4, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0.2, 0, 0.3, 0.8, 0.6, 0.7],
+            'Graspan': [1, 0, 0.6, 0, 0, 0.4, 0, 0, 0, 0, 0.6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0.6, 1],
+            'Kamoto': [1, 0, 0.6, 0, 0, 0.4, 0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0.6, 0, 0.6, 1],
+            'Kamoto SX-EW': [1, 0, 0.6, 0, 0, 0.4, 0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0.6, 0, 0.6, 1],
+            'KOF': [1, 0, 0.6, 0, 0, 0.4, 0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0.6, 0, 0.6, 1],
+            'KOV': [1, 0, 0.6, 0, 0, 0.4, 0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0.6, 0.6, 0.6, 1],
+            'Kroondal': [1, 0, 0.6, 0, 0.8, 0.4, 0, 0.8, 0.7, 0.7, 0.5, 0.8, 0.4, 0, 0, 0.7, 0.2, 0, 0.6, 0.6, 0.6, 1],
+            'Lakeside': [1, 0, 0.4, 0, 0.8, 0.4, 0, 0.8, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0.1, 0, 0.3, 0.8, 0.6, 0.7],
+            'Leeuwfontein': [1, 0, 0.4, 0, 0.8, 0.4, 0, 0.8, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0.2, 0, 0.3, 0.8, 0.6, 0.7],
+            'Leverettrust': [1, 0, 0.6, 0, 0.6, 0.4, 0, 0, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0, 0, 0.9, 0.8, 0.9, 0],
+            'McArthur River': [1, 0, 0.6, 0, 0, 0, 0, 0, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0.1, 0, 0, 0.8, 0.8, 0],
+            'Phoenix': [1, 0, 0.6, 0, 0, 0.4, 0, 0.8, 0.6, 0.6, 0.6, 0.1, 0, 0, 0, 1, 0.4, 0, 0.9, 0.8, 0.6, 0],
+            'Ravensworth': [1, 0.6, 0.6, 0, 0, 0.4, 0, 0.8, 0.9, 0.9, 0.6, 0, 0, 0, 0, 1, 0, 0, 0, 0.8, 0.6, 0]
+        }
+    }
+]

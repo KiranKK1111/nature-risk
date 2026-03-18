@@ -1,0 +1,234 @@
+# trigger:
+#   - develop
+#   - release/*
+#   - main
+
+# pool: 'sc-linux'
+
+# parameters:
+#   - name: releaseId
+#     type: string
+#     displayName: Release WorkItem ID
+#     default: '7396020'
+
+#   - name: devEnvironments
+#     displayName: DEV Deploy Environment
+#     default: ['esg-sa-09']
+#     type: object
+#   - name: qaEnvironments
+#     displayName: QA Deploy Environment
+#     default: ['esg-sa-10']
+#     type: object
+
+# resources:
+#   repositories:
+#     - repository: governed-templates
+#       name: dj-core/governed-templates
+#       ref: 'main'
+#       type: git
+
+# variables:
+#   - group: 51785-NonProd
+#   - group: 51785-Prod
+
+#   - name: helmReleaseName
+#     value: esg-nature-risk-map-fe
+
+#   - name: BRANCH_NAME
+#     value: $(Build.SourceBranchName)
+#   - name: VERSION
+#     value: '$(Build.SourceBranchName)-$(Build.BuildNumber)'
+#   - name: Image_Name
+#     value: '$(Build.Repository.Name)/$(Build.Repository.Name)-$(Build.SourceBranchName)'
+
+# extends:
+#   template: governed-template/build-and-deploy.yml@governed-templates
+#   parameters:
+#     releaseId: ${{ parameters.releaseId }}
+#     buildStackName: node
+#     ITAM: 51785
+#     featureRelease: true
+#     runDevStage: true
+#     buildStackParams:
+#       pool: 'sc-linux'
+#       nodeVersion: '20.11.0'
+#       npmTaskList:
+#         # - name: 'Run Test Coverage'
+#         #   task: run test:coverage
+#         - name: 'Run Build'
+#           task: run build
+#       useYarn: false
+#       featureRelease: true
+#       featureBranchScan: true
+#       deployStackName: 'helm' #Required if deployment stack is helm/ansible"
+#       deploymentFolderName: '51785-esg-nature-risk-map-fe' #optional
+#       archiveType: 'zip' #optional
+#       targetPathArtifactory: 'generic-release' #optional
+#       dockerBuild: true
+#       dockerRepository: 'esgintel'
+#       generateUnitTestReport: 'true'
+#       generateCodeCoverage: 'false'
+#       coverageSummaryFileLocation: 'coverage/cobertura-coverage.xml'
+#       sonarCoveragePath: 'coverage/lcov.info'
+#       testCoveragePath: 'coverage/lcov-report'
+#       imageListFilePath: 'images.yaml'
+#       dockerFilePaths:
+#         - path: '$(Build.Repository.Name)/Dockerfile'
+#           imageName: '$(helmReleaseName)'
+#           imageTag: '$(VERSION)'
+#           dockerBuildContext: '$(Build.Repository.Name)'
+#       calculateImageDigest: true
+#       preInputFileList: ['51785-esg-nature-risk-map-fe/Chart.yaml']
+#       postinputFileList: ['51785-esg-nature-risk-map-fe/values/values-*.yaml']
+#       postvariableList:
+#         - name: IMAGE_DIGEST
+#           value: $(DockerImageDigest_esg-nature-risk-map-fe)
+#       # deployStackName: "ansible" #optional
+#       # deploymentFolderName: "ado-playbooks" #optional
+
+#       # binaryPath: './**/target/classes'
+#       # sonarInclusions: 'src'
+#       # sonarExclusions: "**/*.test.tsx,src/redux/ducks/*"
+#       sonarExclusions: "/**"
+#       #'**/*.test.tsx,src/services/answerService.ts,src/components/left-bar/file-upload/FileUpload.tsx'
+#       sonarCoverageExclusions: "/**"
+#       #'**/*.test.tsx,src/redux/**,src/services/**,src/components/left-bar/file-upload/FileUpload.tsx'
+#       skipEarlyFeedback: true #optional [To skip Early Feedback stage]
+#       # add the below parameters for creation of helm package and helm upload.
+#       # helmArguments: '$(Build.Repository.Name)/test'
+#       # helmPackageUpload: true
+#       # helmRelativePathArtifactory: 'value/helm/test/api-helm-chart1/'
+
+#     deployStackName: openshift
+#     deployEnvironments:
+#       - ${{ each devEnv in parameters.devEnvironments }}:
+#           - name: dev_${{ replace(devEnv, '-','_') }}
+#             environment: dev
+#             displayName: DEV-${{ devEnv }}
+#             pool: sc-linux
+#             helm_openshift_job_details:
+#               helm_deploy: true
+#               Namespace: ${{ devEnv }}
+#               ${{ if eq( devEnv, 'esg-sa-09') }}:
+#                 openshift_server: 'https://api.colt-np.ocp.dev.net:6443'
+#               ${{ elseif eq( devEnv, 'esg-sa-10') }}:
+#                 openshift_server: 'https://api.colt-np2.ocp.dev.net:6443'
+#               openshift_username: $(openshift_devops_deployer_username)
+#               openshift_password: $(openshift_devops_deployer_password)
+#               helm_release: '51785-esg-nature-risk-map-fe'
+#               helm_chart_values: '51785-esg-nature-risk-map-fe/values/values-dev-${{devEnv}}.yaml'
+#               helm_chart_path: '51785-esg-nature-risk-map-fe'
+#               helm_extra_args: '--install'
+#             helmChartValuesPath: '51785-esg-nature-risk-map-fe/values/values-dev-${{devEnv}}.yaml'
+#             notifyUsers: |
+#               MohammedAbdullah.Rabbani@sc.com
+
+#       - ${{ each qaEnv in parameters.qaEnvironments }}:
+#           - name: qa_${{ replace(qaEnv, '-','_') }}
+#             environment: qa
+#             displayName: QA-${{ qaEnv }}
+#             notifyUsers: MohammedAbdullah.Rabbani@sc.com
+#             pool: sc-linux
+#             helm_openshift_job_details:
+#               helm_deploy: true
+#               ${{ if eq( qaEnv, 'np-esg-lb-02') }}:
+#                 Namespace: 'esg-lb-02'
+#                 openshift_server: 'https://api.colt-np.ocp.dev.net:6443'
+#               ${{ elseif eq( qaEnv, 'np2-esg-lb-02') }}:
+#                 Namespace: 'esg-lb-02'
+#                 openshift_server: 'https://api.colt-np2.ocp.dev.net:6443'
+#               ${{ elseif eq( qaEnv, 'esg-sa-10') }}:
+#                 Namespace: 'esg-sa-10'
+#                 openshift_server: 'https://api.colt-np2.ocp.dev.net:6443'
+#               openshift_username: $(openshift_devops_deployer_username)
+#               openshift_password: $(openshift_devops_deployer_password)
+#               helm_release: '51785-esg-nature-risk-map-fe'
+#               helm_chart_values: '51785-esg-nature-risk-map-fe/values/values-qa-${{qaEnv}}.yaml'
+#               helm_chart_path: '51785-esg-nature-risk-map-fe'
+#               helm_extra_args: '--install'
+#             helmChartValuesPath: '51785-esg-nature-risk-map-fe/values/values-qa-${{qaEnv}}.yaml'
+#             # hasGenie: false
+#             hasTestManual: true
+#             dependsOn:
+#               - dev_${{ replace(parameters.devEnvironments[0], '-','_')  }}
+
+#       - name: staging
+#         environment: staging
+#         displayName: staging
+#         notifyUsers: MohammedAbdullah.Rabbani@sc.com
+#         pool: sc-linux
+#         helm_openshift_job_details:
+#           helm_deploy: true
+#           Namespace: 'esg-sa-10'
+#           openshift_server: 'https://api.colt-np2.ocp.dev.net:6443'
+#           openshift_username: $(openshift_devops_deployer_username)
+#           openshift_password: $(openshift_devops_deployer_password)
+#           helm_release: '51785-esg-nature-risk-map-fe'
+#           helm_chart_values: '51785-esg-nature-risk-map-fe/values/values-dev-esg-sa-10.yaml'
+#           helm_chart_path: '51785-esg-nature-risk-map-fe'
+#           helm_extra_args: '--install'
+#         helmChartValuesPath: '51785-esg-nature-risk-map-fe/values/values-dev-esg-sa-10.yaml'
+#         # hasGenie: false
+#         hasTestManual: true
+#         dependsOn:
+#           - qa_${{ replace(parameters.qaEnvironments[0], '-','_')  }}
+
+#       - name: release_checks
+#         environment: pre-release
+#         displayName: pre_release_check
+#         pool: sc-linux
+#         #hasGenie: false
+#         hasTestManual: false
+#         dependsOn:
+#           - staging
+#         notifyUsers:
+#           MohammedAbdullah.Rabbani@sc.com
+#           # hasTestReport: false
+
+#       - name: release
+#         displayName: Release_approval
+#         environment: release
+#         pool: sc-linux
+#         dependsOn:
+#           - release_checks
+#         notifyUsers: MohammedAbdullah.Rabbani@sc.com
+
+#       - name: prod
+#         environment: production
+#         displayName: Production
+#         pool: sc-linux
+#         enableManualPIT: true
+#         helm_openshift_job_details:
+#           helm_deploy: true
+#           Namespace: 'esg'
+#           openshift_server: 'https://api.colt-prd.ocp.sc.net:6443'
+#           openshift_username: $(openshift_devops_deployer_prd_username)
+#           openshift_password: $(openshift_devops_deployer_prd_password)
+#           helm_release: '51785-esg-nature-risk-map-fe'
+#           helm_chart_values: '51785-esg-nature-risk-map-fe/values/values-prd.yaml'
+#           helm_chart_path: '51785-esg-nature-risk-map-fe'
+#           helm_extra_args: '--install'
+#         helmChartValuesPath: '51785-esg-nature-risk-map-fe/values/values-prd.yaml'
+#         dependsOn:
+#           - release
+#         notifyUsers: MohammedAbdullah.Rabbani@sc.com
+
+#       - name: DR
+#         environment: DR
+#         displayName: DR
+#         pool: sc-linux
+#         enableManualPIT: true
+#         helm_openshift_job_details:
+#           helm_deploy: true
+#           Namespace: 'esg'
+#           openshift_server: 'https://api.colt-dr.ocp.sc.net:6443'
+#           openshift_username: $(openshift_devops_deployer_prd_username)
+#           openshift_password: $(openshift_devops_deployer_prd_password)
+#           helm_release: '51785-esg-nature-risk-map-fe'
+#           helm_chart_values: '51785-esg-nature-risk-map-fe/values/values-dr.yaml'
+#           helm_chart_path: '51785-esg-nature-risk-map-fe'
+#           helm_extra_args: '--install'
+#         helmChartValuesPath: '51785-esg-nature-risk-map-fe/values/values-dr.yaml'
+#         dependsOn:
+#           - prod
+#         notifyUsers: MohammedAbdullah.Rabbani@sc.com

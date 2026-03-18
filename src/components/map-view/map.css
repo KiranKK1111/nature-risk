@@ -1,0 +1,144 @@
+.map-legend {
+    max-width: 320px;
+    min-width: 180px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0001;
+    padding: 12px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 10px;
+    z-index: 1000;
+    overflow-x: auto;
+    word-break: break-word;
+}
+
+.legend-list {
+    list-style: none;
+    padding-top: 2px;
+    padding-left: 0;
+    margin: 0;
+}
+
+.legend-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    font-size: 12px;
+    line-height: 1.3;
+    gap: 6px;
+}
+
+.legend-icon,
+.legend-circle-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0;
+    vertical-align: middle;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .map-legend {
+        max-width: 98vw;
+        min-width: 0;
+        padding: 10px 8px;
+        font-size: 12px;
+        margin: 4px;
+    }
+    .legend-icon,
+    .legend-circle-icon {
+        width: 10px;
+        height: 10px;
+        margin-right: 0;
+    }
+}
+
+/* ------------------------------------------------------------ */
+
+.layer-control {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 40px;
+    cursor: pointer;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    margin-right: 8px;
+}
+
+.toggle-icon {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.layer-control-content {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
+    /* Default width when visible */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    max-height: 500px;
+    /* Set a maximum height when visible */
+    opacity: 1;
+    overflow: hidden;
+}
+
+.layer-control-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.layer-control-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.layer-control-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.layer-label {
+    margin-left: 8px;
+    font-size: 14px;
+}
+
+.layer-control-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+/* ------------------------------------------------------------ */ 
+
+.layer-divider {
+    border: none;
+    height: 5px;
+    background: linear-gradient(to right, #6dd5ed, #2193b0);
+    margin: 5px 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(33,147,176,0.15);
+}
