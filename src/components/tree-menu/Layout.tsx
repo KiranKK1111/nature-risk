@@ -27,7 +27,7 @@ export interface LayerLoadEntry {
   error?: string;
 }
 
-export default function App() {
+export default function Layout() {
   const [showTable, setShowTable] = React.useState(false);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>(
     {

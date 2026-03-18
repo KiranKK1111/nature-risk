@@ -2,9 +2,21 @@ import React from "react";
 import { CLIENT_ASSETS_COLOR, SCB_ASSETS_COLOR, SCB_ASSETS_COLOR_ON_NEGETIVE_CONDITION } from "./geo-json-layer/color-constants";
 import { useSelector } from "react-redux";
 import { LEGEND_DATA } from "./LegendData";
-import LayersIcon from '@mui/icons-material/Layers';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useDraggable } from "../hooks/useDraggable";
 import "./map-view/map.css";
+
+const LayersIcon = ({ size = 16, color = "#1976d2" }: { size?: number; color?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+        <path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>
+    </svg>
+);
+
+const ExpandIcon = ({ expanded, color = "#1976d2" }: { expanded: boolean; color?: string }) => (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill={color}
+        style={{ transform: expanded ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.3s" }}>
+        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
+    </svg>
+);
 
 interface MapLegendProps {
     activeView?: string;
@@ -67,6 +79,7 @@ function renderLegends(layers: any) {
 export default function MapLegend({ activeView }: MapLegendProps): JSX.Element {
     const layers = useSelector((state: any) => state?.geoJson?.layers ?? {});
     const [legendExpanded, setLegendExpanded] = React.useState(true);
+    const { elementRef, positionStyle, onMouseDown, onClickCapture } = useDraggable();
 
     const legendBoxStyle: React.CSSProperties = {
         position: "absolute",
@@ -86,34 +99,29 @@ export default function MapLegend({ activeView }: MapLegendProps): JSX.Element {
         letterSpacing: 0.1,
         userSelect: "none",
         backdropFilter: "blur(2px)",
-        transition: "all 0.3s ease",
+        transition: "box-shadow 0.3s ease",
+        ...positionStyle,
     };
 
     return (
-        <div style={legendBoxStyle}>
+        <div ref={elementRef} style={legendBoxStyle}>
             <div
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     marginBottom: legendExpanded ? 4 : 0,
-                    cursor: "pointer",
+                    cursor: "grab",
                 }}
+                onMouseDown={onMouseDown}
+                onClickCapture={onClickCapture}
                 onClick={() => setLegendExpanded(!legendExpanded)}
             >
                 <div style={{ fontWeight: 700, color: "#1976d2", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-                    <LayersIcon sx={{ fontSize: 16, color: "#1976d2" }} />
+                    <LayersIcon />
                     {legendExpanded && "Legend"}
                 </div>
-                <ExpandMoreIcon
-                    sx={{
-                        fontSize: 18,
-                        color: "#1976d2",
-                        transform: legendExpanded ? "rotate(0deg)" : "rotate(180deg)",
-                        transition: "transform 0.3s",
-                        marginLeft: 1,
-                    }}
-                />
+                <ExpandIcon expanded={legendExpanded} color="#1976d2" />
             </div>
             {legendExpanded && (
                 <>

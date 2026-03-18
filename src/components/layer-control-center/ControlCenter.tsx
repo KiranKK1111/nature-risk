@@ -261,7 +261,7 @@ export default function ControlCenter(): JSX.Element {
                             bgcolor: '#e3f2fd',
                             borderBottom: '1px solid #b0bec5',
                             minHeight: 48,
-                            '& .MuiTypography-root': { fontWeight: 700, fontSize: 16 },
+                            '& .MuiTypography-root': { fontWeight: 700, fontSize: 14 },
                         }}>
                             <Typography>{section.title}</Typography>
                         </AccordionSummary>
@@ -273,7 +273,7 @@ export default function ControlCenter(): JSX.Element {
                                         if (checkbox.isHeading) {
                                             return (
                                                 <Box key={checkbox.key} sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 1, pl: 1 }}>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, fontSize: 15, color: '#1976d2' }}>{checkbox.label}</Typography>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, fontSize: 13, color: '#1976d2' }}>{checkbox.label}</Typography>
                                                     {checkbox.tooltip && (
                                                         <Tooltip title={checkbox.tooltip} placement="right" arrow>
                                                             <img src={getAssetUrl('static/images/info-icon.png')} alt="Info" style={{ maxWidth: "15px" }} />
@@ -308,7 +308,7 @@ export default function ControlCenter(): JSX.Element {
                                                         }
                                                         label={
                                                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-                                                                <Typography sx={{ fontSize: 14, lineHeight: 1 }}>{checkbox.label}</Typography>
+                                                                <Typography sx={{ fontSize: 12, lineHeight: 1 }}>{checkbox.label}</Typography>
                                                                 {checkbox.tooltip && (
                                                                     <Tooltip title={checkbox.tooltip} placement="right" arrow>
                                                                         <img src={getAssetUrl('static/images/info-icon.png')} alt="Info" style={{ maxWidth: "15px" }} />
@@ -344,7 +344,7 @@ export default function ControlCenter(): JSX.Element {
                                                                 {isLoading && (
                                                                     <CircularProgress size={14} thickness={5} sx={{ mr: 0.5 }} />
                                                                 )}
-                                                                <Typography sx={{ fontSize: 14, lineHeight: 1, color: layerError ? 'error.main' : 'inherit' }}>
+                                                                <Typography sx={{ fontSize: 12, lineHeight: 1, color: layerError ? 'error.main' : 'inherit' }}>
                                                                     {checkbox.label}{layerError ? ' (failed)' : ''}
                                                                 </Typography>
                                                                 {checkbox.tooltip && (
@@ -374,7 +374,7 @@ export default function ControlCenter(): JSX.Element {
                                                                         textAlign: 'center',
                                                                         px: 1,
                                                                         py: 0.3,
-                                                                        fontSize: 11,
+                                                                        fontSize: 10,
                                                                         lineHeight: 1.4,
                                                                         whiteSpace: 'nowrap',
                                                                         fontWeight: selectedYear === year ? 600 : 400,
@@ -421,7 +421,7 @@ export default function ControlCenter(): JSX.Element {
                                                             {isLayerLoading && (
                                                                 <CircularProgress size={14} thickness={5} sx={{ mr: 0.5 }} />
                                                             )}
-                                                            <Typography sx={{ fontSize: 14, lineHeight: 1, color: layerErr ? 'error.main' : 'inherit' }}>
+                                                            <Typography sx={{ fontSize: 12, lineHeight: 1, color: layerErr ? 'error.main' : 'inherit' }}>
                                                                 {checkbox.label}{layerErr ? ' (failed)' : ''}
                                                             </Typography>
                                                             {checkbox.tooltip && (

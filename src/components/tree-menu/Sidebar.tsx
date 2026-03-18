@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <Box
             sx={{
-                width: sidebarCollapsed ? 56 : 400,
+                width: sidebarCollapsed ? 56 : 350,
                 minWidth: 56,
                 flexShrink: 0,
                 display: 'flex',
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     variant="h6"
                                     sx={{
                                         flexGrow: 1,
-                                        fontSize: { xs: 13, sm: 14 },
+                                        fontSize: { xs: 12, sm: 13 },
                                         fontWeight: 600,
                                         textAlign: 'left',
                                         minWidth: 0,
@@ -148,6 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             style={{
                                 background: '#1976d2',
                                 color: '#fff',
+                                fontSize: 12,
                                 width: sidebarCollapsed ? 0 : 'inherit',
                             }}
                         >
@@ -178,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <Select
                                 size="small"
                                 displayEmpty
-                                sx={{ width: selectedSector ? 150 : '100%' }}
+                                sx={{ width: selectedSector ? 150 : '100%', fontSize: 12 }}
                                 value={selectedSector}
                                 onChange={(e) => setSelectedSector && setSelectedSector(e.target.value)}
                                 renderValue={selected => selected ? selected : 'Select Sector'}
@@ -190,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 <Select
                                     size="small"
                                     displayEmpty
-                                    sx={{ width: 150 }}
+                                    sx={{ width: 150, fontSize: 12 }}
                                     value={selectedClient}
                                     onChange={(e) => setSelectedClient &&setSelectedClient(e.target.value)}
                                     renderValue={selected => selected ? selected : 'Select Client'}

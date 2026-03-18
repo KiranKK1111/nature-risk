@@ -2,8 +2,19 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { layerSections } from "./layer-control-center/layerConfig";
 import { LayerLoadEntry } from "./tree-menu/Layout";
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useDraggable } from "../hooks/useDraggable";
+const MonitorHeartIcon = ({ size = 16, color = "#1976d2" }: { size?: number; color?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+        <path d="M15.11 12.45L14 10.24l-3.11 6.21c-.16.34-.51.55-.89.55s-.73-.21-.89-.55L7.38 13H2v-2h6c.38 0 .72.21.89.55L10 13.76l3.11-6.21c.34-.68 1.45-.68 1.79 0L16.62 11H22v2h-6c-.38 0-.72-.21-.89-.55z"/>
+    </svg>
+);
+
+const ExpandIcon = ({ expanded, color = "#90a4ae" }: { expanded: boolean; color?: string }) => (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill={color}
+        style={{ transform: expanded ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.25s" }}>
+        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>
+    </svg>
+);
 
 interface MemoryInfoBoxProps {
   memory: {
@@ -33,6 +44,7 @@ for (const section of layerSections) {
 
 const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings, isCollapsed, setIsCollapsed, layerLoadStatus = [] }) => {
   const layersState = useSelector((state: any) => state.geoJson?.layers || {});
+  const { elementRef, positionStyle, onMouseDown, onClickCapture } = useDraggable();
 
   // Derive active layers from Redux — only individual layers the user toggled visible
   // Skip headings and "Select All" mainCheck entries
@@ -88,6 +100,7 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
 
   return (
     <div
+      ref={elementRef}
       style={{
         position: "absolute",
         bottom: 16,
@@ -106,22 +119,25 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
         letterSpacing: 0.1,
         userSelect: "none",
         backdropFilter: "blur(8px)",
-        transition: "all 0.25s ease",
+        transition: "box-shadow 0.25s ease",
+        ...positionStyle,
       }}
     >
-      {/* Header */}
+      {/* Header — drag handle */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: isCollapsed ? 0 : 5,
-          cursor: "pointer",
+          cursor: "grab",
         }}
+        onMouseDown={onMouseDown}
+        onClickCapture={onClickCapture}
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         <div style={{ fontWeight: 700, color: "#1976d2", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-          <MonitorHeartIcon sx={{ fontSize: 16, color: "#1976d2" }} />
+          <MonitorHeartIcon />
           {!isCollapsed && "System Metrics"}
           {(!fetchComplete || anyLoading) && (
             <span style={{
@@ -132,15 +148,7 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
             }} />
           )}
         </div>
-        <ExpandMoreIcon
-          sx={{
-            fontSize: 18,
-            color: "#90a4ae",
-            transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 0.25s",
-            marginLeft: 0.5,
-          }}
-        />
+        <ExpandIcon expanded={!isCollapsed} />
       </div>
 
       {/* Data Fetch Progress Bar — always visible when data is being fetched */}

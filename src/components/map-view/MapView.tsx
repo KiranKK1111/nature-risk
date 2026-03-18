@@ -150,6 +150,10 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
   const [loadedCount, setLoadedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
+  // Separate loading state for image overlay layers (BOD, TDS, aerosols)
+  const [ncLoadedCount, setNcLoadedCount] = useState(0);
+  const [ncTotalCount, setNcTotalCount] = useState(0);
+
   return (
     <div className="map-container" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, position: 'relative' }}>
@@ -167,7 +171,6 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
           preferCanvas={true}
         >
           {/* REMOVE DEFAULT OSM TILE LAYER: Do not add any <TileLayer ...> here! */}
-          <MapLegend activeView={activeView} />
           <RenderGeoLayer onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
           {totalCount > 0 && loadedCount < totalCount && (
             <LoadingInfo loaded={loadedCount} total={totalCount} />
@@ -180,9 +183,13 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
             />
           )}
           <GlobioTileMap onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
-          <RenderNCLayer year={2022} onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
+          <RenderNCLayer year={2022} onTileLoad={setNcLoadedCount} onTileTotal={setNcTotalCount} />
         </MapContainer>
         <MapLoadingToast />
+        {ncTotalCount > 0 && ncLoadedCount < ncTotalCount && (
+          <LoadingInfo loaded={ncLoadedCount} total={ncTotalCount} />
+        )}
+        <MapLegend activeView={activeView} />
         <MemoryInfoBox
           memory={memory}
           cpu={cpu}

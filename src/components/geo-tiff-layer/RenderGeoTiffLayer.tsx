@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
-import { ForestLossPNGLayer } from "./ForestLossPNGLayer";
 import { loadTileManifest } from "./FileDiscovery";
 import { TileSpatialIndex } from "./TileManager";
+import { ForestLossPNGLayer } from "./ForestLossPngLayer";
 
 interface RenderGeoLayerProps {
   onTileLoad?: (loaded: number) => void;
