@@ -18,6 +18,7 @@ import GlobioTileMap from '../geo-tiff-layer/GlobioTileMap';
 import LoadingInfo from "../geo-tiff-layer/LoadingInfo";
 import MapLoadingToast from "./MapLoadingToast";
 import { LayerLoadEntry } from "../tree-menu/Layout";
+import HardRefreshButton from "./HardRefreshButton";
 
 interface MapViewProps {
   assetsName?: string,
@@ -172,9 +173,7 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
         >
           {/* REMOVE DEFAULT OSM TILE LAYER: Do not add any <TileLayer ...> here! */}
           <RenderGeoLayer onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
-          {totalCount > 0 && loadedCount < totalCount && (
-            <LoadingInfo loaded={loadedCount} total={totalCount} />
-          )}
+          <LoadingInfo loaded={loadedCount} total={totalCount} />
           {(activeView === 'scbsitesNatureAssetView' || (selectedSector && selectedClient)) && (
             <GeoJsonLayer
               pointLayerData={pointLayerData ?? null}
@@ -186,9 +185,8 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
           <RenderNCLayer year={2022} onTileLoad={setNcLoadedCount} onTileTotal={setNcTotalCount} />
         </MapContainer>
         <MapLoadingToast />
-        {ncTotalCount > 0 && ncLoadedCount < ncTotalCount && (
-          <LoadingInfo loaded={ncLoadedCount} total={ncTotalCount} />
-        )}
+        <HardRefreshButton />
+        <LoadingInfo loaded={ncLoadedCount} total={ncTotalCount} />
         <MapLegend activeView={activeView} />
         <MemoryInfoBox
           memory={memory}

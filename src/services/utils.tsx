@@ -1,6 +1,7 @@
 import { client } from "./axiosClient";
 import { Layer } from 'leaflet';
 import { feature } from "topojson-client";
+import { getCachedJSON, setCachedJSON } from "./indexedDBCache";
 
 // Stream browser memory usage (RAM) using the Performance API (Chrome only)
 // Returns a callback to unsubscribe
@@ -50,29 +51,36 @@ export interface ExtendedMap extends L.Map {
     scLayers?: Map<string, Layer>;
 }
 // Function to fetch and process the JSON response using Axios
+// Uses IndexedDB cache — returns cached data instantly if available
 export async function fetchAndStreamJson(inputData: any, url: string, signal?: AbortSignal) {
-    // Convert inputData to query parameters
     const queryParams = new URLSearchParams(inputData).toString();
     const fullUrl = `${url}?${queryParams}`;
 
+    // Check IndexedDB cache first
+    const cached = await getCachedJSON(fullUrl);
+    if (cached) return cached;
+
     const response = await client.get(fullUrl, {
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         signal,
     });
 
+    // Cache in IndexedDB for next visit
+    setCachedJSON(fullUrl, response.data);
     return response.data;
 }
 
 export async function fetchAndStreamJsonByEntryPoint(url: string, signal?: AbortSignal) {
+    // Check IndexedDB cache first
+    const cached = await getCachedJSON(url);
+    if (cached) return cached;
+
     const response = await client.get(url, {
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         signal,
     });
 
+    setCachedJSON(url, response.data);
     return response.data;
 }
 

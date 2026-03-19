@@ -79,7 +79,7 @@ function renderLegends(layers: any) {
 export default function MapLegend({ activeView }: MapLegendProps): JSX.Element {
     const layers = useSelector((state: any) => state?.geoJson?.layers ?? {});
     const [legendExpanded, setLegendExpanded] = React.useState(true);
-    const { elementRef, positionStyle, onMouseDown, onClickCapture } = useDraggable();
+    const { elementRef, positionStyle, onMouseDown, onClickCapture, parkToCorner, restorePosition } = useDraggable();
 
     const legendBoxStyle: React.CSSProperties = {
         position: "absolute",
@@ -115,7 +115,12 @@ export default function MapLegend({ activeView }: MapLegendProps): JSX.Element {
                 }}
                 onMouseDown={onMouseDown}
                 onClickCapture={onClickCapture}
-                onClick={() => setLegendExpanded(!legendExpanded)}
+                onClick={() => {
+                    const next = !legendExpanded;
+                    setLegendExpanded(next);
+                    if (!next) parkToCorner();
+                    else restorePosition();
+                }}
             >
                 <div style={{ fontWeight: 700, color: "#1976d2", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                     <LayersIcon />

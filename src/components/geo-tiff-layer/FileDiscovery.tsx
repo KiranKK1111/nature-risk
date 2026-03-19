@@ -2,27 +2,36 @@ import { API_ENDPOINTS } from '../../constants/apiEndpoints';
 import { client } from '../../services/axiosClient';
 import { getBackendImageUrl } from '../../services/utils';
 import { TileInfo } from './TileManager';
+import { getCachedJSON, setCachedJSON } from '../../services/indexedDBCache';
+
+const GFC_MANIFEST_CACHE_KEY = "manifest:gfc-png/local_manifest.json";
 
 export async function loadTileManifest(
   options?: { fallbackToPotential?: boolean }
 ): Promise<TileInfo[]> {
   try {
-    const response = await client.get(`${API_ENDPOINTS.GET_MANIFEST}?path=gfc-png/local_manifest.json`);
-    if (response.status !== 200) {
-      console.warn(`Failed to load tile manifest (${response.status}): ${response.statusText}`);
-      if (!options?.fallbackToPotential) return [];
-      console.warn("Falling back to potential filenames.");
-    }
-
     let data: any;
 
-    // Axios automatically parses JSON responses
-    try {
-      data = response.data;
-      
-    } catch {
-      console.log("Manifest is not valid JSON.");
-      return [];
+    // Check IndexedDB cache first
+    const cached = await getCachedJSON(GFC_MANIFEST_CACHE_KEY);
+    if (cached) {
+      data = cached;
+    } else {
+      const response = await client.get(`${API_ENDPOINTS.GET_MANIFEST}?path=gfc-png/local_manifest.json`);
+      if (response.status !== 200) {
+        console.warn(`Failed to load tile manifest (${response.status}): ${response.statusText}`);
+        if (!options?.fallbackToPotential) return [];
+        console.warn("Falling back to potential filenames.");
+      }
+
+      try {
+        data = response.data;
+      } catch {
+        console.log("Manifest is not valid JSON.");
+        return [];
+      }
+
+      setCachedJSON(GFC_MANIFEST_CACHE_KEY, data);
     }
 
     const tiles: TileInfo[] = [];

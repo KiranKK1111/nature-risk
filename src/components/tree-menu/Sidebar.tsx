@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <Box
             sx={{
-                width: sidebarCollapsed ? 56 : 350,
+                width: sidebarCollapsed ? 56 : 400,
                 minWidth: 56,
                 flexShrink: 0,
                 display: 'flex',

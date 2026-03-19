@@ -5,6 +5,12 @@ import { ExtendedMap, removeLayersByName } from '../../services/utils';
 import { CLIENT_ASSETS_COLOR, SCB_ASSETS_COLOR_ON_NEGETIVE_CONDITION } from './color-constants';
 import "../../App.css";
 
+export interface MarkerClickData {
+    properties: Record<string, any>;
+    latlng: L.LatLng;
+    selectedLayer: string;
+}
+
 export default function RenderPointLayer(
     layerName: string,
     color: string,
@@ -12,6 +18,7 @@ export default function RenderPointLayer(
     geojsonData: FeatureCollection<Geometry, any>,
     showLayer: boolean,
     map: ExtendedMap,
+    onMarkerClick?: (data: MarkerClickData) => void,
 ): Promise<number> {
     return new Promise((resolve) => {
         removeLayersByName(layerName, map);
@@ -56,15 +63,16 @@ export default function RenderPointLayer(
                     });
                 },
                 onEachFeature: (features, layer) => {
-                    let popupContents = '';
-                    if (selectedLayer === 'clientsNatureAssetView') {
-                        popupContents = getPopupContentsForClientAssets(features.properties);
-                    } else if (selectedLayer === 'scbsitesNatureAssetView') {
-                        popupContents = getPopupContentsForSCBAssets(features.properties);
-                    } else {
-                        popupContents = 'No data available';
+                    if (onMarkerClick) {
+                        layer.on('click', (e: L.LeafletMouseEvent) => {
+                            L.DomEvent.stopPropagation(e);
+                            onMarkerClick({
+                                properties: features.properties,
+                                latlng: e.latlng,
+                                selectedLayer,
+                            });
+                        });
                     }
-                    layer.bindPopup(popupContents);
                 },
             });
 
@@ -112,26 +120,26 @@ function hasZeroValueForKeys(objArray: Array<Record<string, any>>): boolean {
     );
 }
 
-function getPopupContentsForSCBAssets(properties: Record<string, any>) {
-    return `
-    <b>Asset Name:</b> ${properties?.asset_name}<br>
-    <b>Asset Type:</b> ${properties?.asset_type}<br>
-    <b>Sensitive Area:</b> ${properties?.sensitive_area}<br>
-    <b>Latitude:</b> ${properties?.latitude}<br>
-    <b>Longitude:</b> ${properties?.longitude}<br>
-    `;
+export function getPopupContentsForSCBAssets(properties: Record<string, any>) {
+    return [
+        { label: 'Asset Name', value: properties?.asset_name },
+        { label: 'Asset Type', value: properties?.asset_type },
+        { label: 'Sensitive Area', value: properties?.sensitive_area },
+        { label: 'Latitude', value: properties?.latitude },
+        { label: 'Longitude', value: properties?.longitude },
+    ];
 }
 
-function getPopupContentsForClientAssets(properties: Record<string, any>) {
-    return `
-    <b>Parent Name :</b> ${properties["parent_name"]}<br>
-    <b>Country :</b> ${properties["country"]}<br>
-    <b>Asset Type :</b> ${properties["SC_asset_type"]}<br>
-    <b>Asset Activity :</b> ${properties["asset_activity"]}<br>
-    <b>Asset Name :</b> ${properties["asset_name"]}<br>
-    <b>Latitude :</b> ${properties["latitude"]},
-    <b>Longitude :</b> ${properties["longitude"]}<br>
-    `;
+export function getPopupContentsForClientAssets(properties: Record<string, any>) {
+    return [
+        { label: 'Parent Name', value: properties["parent_name"] },
+        { label: 'Country', value: properties["country"] },
+        { label: 'Asset Type', value: properties["SC_asset_type"] },
+        { label: 'Asset Activity', value: properties["asset_activity"] },
+        { label: 'Asset Name', value: properties["asset_name"] },
+        { label: 'Latitude', value: properties["latitude"] },
+        { label: 'Longitude', value: properties["longitude"] },
+    ];
 }
 
 /** Darken a hex color by a given factor (0 = no change, 1 = black) */

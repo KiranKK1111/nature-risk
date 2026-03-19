@@ -44,7 +44,7 @@ for (const section of layerSections) {
 
 const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings, isCollapsed, setIsCollapsed, layerLoadStatus = [] }) => {
   const layersState = useSelector((state: any) => state.geoJson?.layers || {});
-  const { elementRef, positionStyle, onMouseDown, onClickCapture } = useDraggable();
+  const { elementRef, positionStyle, onMouseDown, onClickCapture, parkToCorner, restorePosition } = useDraggable();
 
   // Derive active layers from Redux — only individual layers the user toggled visible
   // Skip headings and "Select All" mainCheck entries
@@ -120,6 +120,7 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
         userSelect: "none",
         backdropFilter: "blur(8px)",
         transition: "box-shadow 0.25s ease",
+        overflow: "hidden",
         ...positionStyle,
       }}
     >
@@ -134,7 +135,12 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
         }}
         onMouseDown={onMouseDown}
         onClickCapture={onClickCapture}
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={() => {
+          const next = !isCollapsed;
+          setIsCollapsed(next);
+          if (next) parkToCorner(true);
+          else restorePosition(true);
+        }}
       >
         <div style={{ fontWeight: 700, color: "#1976d2", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
           <MonitorHeartIcon />
@@ -247,7 +253,6 @@ const MemoryInfoBox: React.FC<MemoryInfoBoxProps> = ({ memory, cpu, layerTimings
 
           <ul style={{
             margin: 0, padding: 0, listStyle: "none",
-            maxHeight: 100, overflowY: "auto",
           }}>
             {/* Background data fetches (not yet toggled on) */}
             {fetchingLayers.map((entry) => (
