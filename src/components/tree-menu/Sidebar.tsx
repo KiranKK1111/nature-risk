@@ -8,11 +8,28 @@ import {
     Divider,
     Select,
     MenuItem,
+    Autocomplete,
+    TextField,
+    Chip,
+    Checkbox,
 } from '@mui/material';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import './Layout.css';
 import ControlCenter from '../layer-control-center/ControlCenter';
+
+const CLIENT_OPTIONS = [
+    'Glencore',
+    'BHP Group',
+    'Rio Tinto',
+    'Vale S.A.',
+    'Anglo American',
+    'Freeport-McMoRan',
+    'Teck Resources',
+    'Newmont Corporation',
+    'Barrick Gold',
+    'South32',
+];
 
 interface SidebarProps {
     sidebarCollapsed: boolean;
@@ -21,24 +38,28 @@ interface SidebarProps {
     assetsName: string;
     activeView?: string;
     selectedSector?: string;
-    selectedClient?: string;
+    selectedGroup?: string;
+    selectedClient?: string[];
     showTable?: boolean;
     setShowTable?: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedSector?: React.Dispatch<React.SetStateAction<string>>;
-    setSelectedClient?: React.Dispatch<React.SetStateAction<string>>;
+    setSelectedGroup?: React.Dispatch<React.SetStateAction<string>>;
+    setSelectedClient?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
-    sidebarCollapsed, 
-    assetsCount, 
-    assetsName, 
+export const Sidebar: React.FC<SidebarProps> = ({
+    sidebarCollapsed,
+    assetsCount,
+    assetsName,
     setSidebarCollapsed,
     activeView,
     selectedSector,
+    selectedGroup,
     selectedClient,
     showTable,
     setShowTable,
     setSelectedSector,
+    setSelectedGroup,
     setSelectedClient
 }: SidebarProps) => {
     return (
@@ -143,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 {sidebarCollapsed ? <MenuIcon /> : <MenuOpenIcon />}
                             </IconButton>
                         </Box>
-                        {!sidebarCollapsed && activeView === 'clientsNatureAssetView' && selectedSector && selectedClient && setShowTable ? <Button
+                        {!sidebarCollapsed && activeView === 'clientsNatureAssetView' && selectedSector && ((selectedClient?.length ?? 0) > 0) && setShowTable ? <Button
                             onClick={() => setShowTable((prev) => !prev)}
                             style={{
                                 background: '#1976d2',
@@ -161,45 +182,86 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Sidebar Content */}
             {!sidebarCollapsed ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-                    {/* Dropdowns for client and sector selection */}
-                    {(activeView === 'clientsNatureAssetView' || !(selectedSector && selectedClient)) && (
+                    {/* Dropdowns for sector, group and client selection */}
+                    {(activeView === 'clientsNatureAssetView' || !(selectedSector && ((selectedClient?.length ?? 0) > 0))) && (
                         <Box
                             sx={{
                                 display: 'flex',
-                                gap: 2,
+                                flexDirection: 'column',
+                                gap: 1,
                                 px: 2,
-                                py: 1,
-                                alignItems: 'center',
+                                py: 1.5,
                                 bgcolor: 'background.paper',
                                 borderBottom: 1,
                                 borderColor: 'divider',
-                                justifyContent: 'center',
                             }}
                         >
-                            <Select
-                                size="small"
-                                displayEmpty
-                                sx={{ width: selectedSector ? 150 : '100%', fontSize: 12 }}
-                                value={selectedSector}
-                                onChange={(e) => setSelectedSector && setSelectedSector(e.target.value)}
-                                renderValue={selected => selected ? selected : 'Select Sector'}
-                            >
-                                <MenuItem value="Metals & Minings">Metals & Minings</MenuItem>
-                            </Select>
-
-                            {selectedSector && (
+                            {/* Row 1: Sector + Group (side by side) */}
+                            <Box sx={{ display: 'flex', gap: 1 }}>
                                 <Select
                                     size="small"
                                     displayEmpty
-                                    sx={{ width: 150, fontSize: 12 }}
-                                    value={selectedClient}
-                                    onChange={(e) => setSelectedClient &&setSelectedClient(e.target.value)}
-                                    renderValue={selected => selected ? selected : 'Select Client'}
+                                    sx={{ flex: 1, fontSize: 12 }}
+                                    value={selectedSector}
+                                    onChange={(e) => setSelectedSector && setSelectedSector(e.target.value)}
+                                    renderValue={selected => selected ? selected : 'Select Sector'}
                                 >
-                                    <MenuItem value="Glencore">Glencore</MenuItem>
+                                    <MenuItem value="Metals & Minings">Metals & Minings</MenuItem>
                                 </Select>
-                            )}
 
+                                {selectedSector && (
+                                    <Select
+                                        size="small"
+                                        displayEmpty
+                                        sx={{ flex: 1, fontSize: 12 }}
+                                        value={selectedGroup}
+                                        onChange={(e) => setSelectedGroup && setSelectedGroup(e.target.value)}
+                                        renderValue={selected => selected ? selected : 'Select Group'}
+                                    >
+                                        <MenuItem value="Group A">Group A</MenuItem>
+                                    </Select>
+                                )}
+                            </Box>
+
+                            {/* Row 2: Client (appears after group is selected) */}
+                            {selectedGroup && (
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    options={CLIENT_OPTIONS}
+                                    value={selectedClient || []}
+                                    onChange={(_e, newValue) => setSelectedClient && setSelectedClient(newValue)}
+                                    disableCloseOnSelect
+                                    renderOption={(props, option, { selected }) => (
+                                        <li {...props} style={{ ...props.style, padding: '2px 8px', fontSize: 12 }}>
+                                            <Checkbox
+                                                size="small"
+                                                checked={selected}
+                                                sx={{ mr: 0.5, p: 0.25 }}
+                                            />
+                                            {option}
+                                        </li>
+                                    )}
+                                    renderTags={(value, getTagProps) =>
+                                        value.map((option, index) => (
+                                            <Chip
+                                                label={option}
+                                                {...getTagProps({ index })}
+                                                size="small"
+                                                sx={{ fontSize: 10, height: 20 }}
+                                            />
+                                        ))
+                                    }
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder={selectedClient?.length ? '' : 'Search Client...'}
+                                            sx={{ '& .MuiInputBase-root': { fontSize: 12, py: '2px' } }}
+                                        />
+                                    )}
+                                    sx={{ width: '100%' }}
+                                />
+                            )}
                         </Box>
                     )}
                     <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>

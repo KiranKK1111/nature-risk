@@ -23,18 +23,41 @@ export default function RenderPolygonLayer(
 
     if (geojsonData) {
             geojsonData = convertMultiPolygonToPolygon(geojsonData);
+
+            // All polygon layers share ONE pane + ONE canvas renderer.
+            // Canvas paints pixels directly — overlapping polygons (same layer or
+            // across layers) simply overwrite each other, no alpha blending.
+            // The shared pane's CSS opacity gives transparency against the basemap.
+            const paneName = layerName === 'aquaBasslineLayer' ? 'polyPane_aqua' : 'polyPane_proximity';
+            if (!map.getPane(paneName)) {
+                const pane = map.createPane(paneName);
+                pane.style.zIndex = '450';
+                pane.style.opacity = '0.7';
+                pane.style.pointerEvents = 'auto';
+            }
+            // Reuse a single canvas renderer per shared pane
+            const rendererKey = `_canvasRenderer_${paneName}`;
+            if (!(map as any)[rendererKey]) {
+                (map as any)[rendererKey] = L.canvas({ pane: paneName });
+            }
+            const renderer = (map as any)[rendererKey];
+
             let geoJsonLayer;
+            const baseOpts = { pane: paneName, renderer } as any;
             if (layerName === "aquaBasslineLayer") {
                 geoJsonLayer = L.geoJSON(geojsonData, {
+                    ...baseOpts,
                     style: (feature?: Feature) => {
-                        let color = defaultColor;
+                        let fillColor = defaultColor;
                         if (feature && feature.properties && typeof feature.properties.bws_label === 'string') {
-                            color = labelColorMap[feature.properties.bws_label] || defaultColor;
+                            fillColor = labelColorMap[feature.properties.bws_label] || defaultColor;
                         }
                         return {
-                            color,
+                            color: fillColor,
+                            fillColor,
                             weight: 0,
-                            fillOpacity: 0.7,
+                            fillOpacity: 1,
+                            stroke: false,
                         };
                     },
                     onEachFeature: (feature, layer) => {
@@ -45,11 +68,14 @@ export default function RenderPolygonLayer(
                 });
             } else {
                 geoJsonLayer = L.geoJSON(geojsonData, {
-                    style: (feature?: Feature) => {                        
+                    ...baseOpts,
+                    style: () => {
                         return {
                             color: color,
+                            fillColor: color,
                             weight: 0,
-                            fillOpacity: 0.7,
+                            fillOpacity: 1,
+                            stroke: false,
                         };
                     },
                     onEachFeature: (feature, layer) => {

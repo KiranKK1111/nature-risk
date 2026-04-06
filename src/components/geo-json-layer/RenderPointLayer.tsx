@@ -9,6 +9,8 @@ export interface MarkerClickData {
     properties: Record<string, any>;
     latlng: L.LatLng;
     selectedLayer: string;
+    isUnsustainable: boolean;
+    marker: L.CircleMarker;
 }
 
 export default function RenderPointLayer(
@@ -66,10 +68,14 @@ export default function RenderPointLayer(
                     if (onMarkerClick) {
                         layer.on('click', (e: L.LeafletMouseEvent) => {
                             L.DomEvent.stopPropagation(e);
+                            const hasNegDist = features.properties?.minimum_distance < 1;
+                            const hasZero = hasZeroValueForKeys([features.properties]);
                             onMarkerClick({
                                 properties: features.properties,
                                 latlng: e.latlng,
                                 selectedLayer,
+                                isUnsustainable: hasNegDist || hasZero,
+                                marker: layer as L.CircleMarker,
                             });
                         });
                     }
@@ -120,18 +126,22 @@ function hasZeroValueForKeys(objArray: Array<Record<string, any>>): boolean {
     );
 }
 
-export function getPopupContentsForSCBAssets(properties: Record<string, any>) {
-    return [
+export function getPopupContentsForSCBAssets(properties: Record<string, any>, breachLayers?: string[]) {
+    const items: { label: string; value: any }[] = [
         { label: 'Asset Name', value: properties?.asset_name },
         { label: 'Asset Type', value: properties?.asset_type },
         { label: 'Sensitive Area', value: properties?.sensitive_area },
         { label: 'Latitude', value: properties?.latitude },
         { label: 'Longitude', value: properties?.longitude },
     ];
+    if (breachLayers !== undefined) {
+        items.push({ label: 'Breach', value: breachLayers.length > 0 ? breachLayers.join(', ') : '—' });
+    }
+    return items;
 }
 
-export function getPopupContentsForClientAssets(properties: Record<string, any>) {
-    return [
+export function getPopupContentsForClientAssets(properties: Record<string, any>, breachLayers?: string[]) {
+    const items: { label: string; value: any }[] = [
         { label: 'Parent Name', value: properties["parent_name"] },
         { label: 'Country', value: properties["country"] },
         { label: 'Asset Type', value: properties["SC_asset_type"] },
@@ -140,6 +150,10 @@ export function getPopupContentsForClientAssets(properties: Record<string, any>)
         { label: 'Latitude', value: properties["latitude"] },
         { label: 'Longitude', value: properties["longitude"] },
     ];
+    if (breachLayers !== undefined) {
+        items.push({ label: 'Breach', value: breachLayers.length > 0 ? breachLayers.join(', ') : '—' });
+    }
+    return items;
 }
 
 /** Darken a hex color by a given factor (0 = no change, 1 = black) */

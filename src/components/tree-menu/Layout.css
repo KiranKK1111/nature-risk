@@ -9,3 +9,23 @@
     display: flex;
     overflow: hidden;
 }
+
+/* Thin scrollbars for sidebar */
+.layout-box ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.layout-box ::-webkit-scrollbar-track {
+    background: transparent;
+}
+.layout-box ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 4px;
+}
+.layout-box ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+.layout-box {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.18) transparent;
+}

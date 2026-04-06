@@ -39,7 +39,8 @@ export default function Layout() {
   const [activeView, setActiveView] = useState<'clientsNatureAssetView' | 'scbsitesNatureAssetView'>('scbsitesNatureAssetView');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedSector, setSelectedSector] = useState<string>('');
-  const [selectedClient, setSelectedClient] = useState<string>('');
+  const [selectedGroup, setSelectedGroup] = useState<string>('');
+  const [selectedClient, setSelectedClient] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string>('scbsitesNatureAssetView');
   const geoJsonData = useSelector((state: any) => state.geoJson) || {};
   const layers = geoJsonData.layers || {};
@@ -138,8 +139,10 @@ export default function Layout() {
   }, [activeView]);
 
   useEffect(() => {
-    if (selectedSector && selectedClient) {
+    if (selectedSector && selectedClient.length > 0) {
       setActiveView('clientsNatureAssetView');
+    } else {
+      setActiveView('scbsitesNatureAssetView');
     }
   }, [selectedSector, selectedClient]);
 
@@ -190,10 +193,12 @@ export default function Layout() {
           setSidebarCollapsed={setSidebarCollapsed}
           activeView={activeView}
           selectedSector={selectedSector}
+          selectedGroup={selectedGroup}
           selectedClient={selectedClient}
           showTable={showTable}
           setShowTable={setShowTable}
           setSelectedSector={setSelectedSector}
+          setSelectedGroup={setSelectedGroup}
           setSelectedClient={setSelectedClient}
         />
 

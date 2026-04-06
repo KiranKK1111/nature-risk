@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   GET_MANIFEST: '/getManifest',
   GET_PNG: '/getPng',
   CPU_STREAM: '/cpu-stream',
+  SAMPLE_RASTER: '/sample_raster',
 };

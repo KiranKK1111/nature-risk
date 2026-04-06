@@ -17,6 +17,7 @@ import { RenderNCLayer } from '../geo-netcdf-layer/RenderNCLayer';
 import GlobioTileMap from '../geo-tiff-layer/GlobioTileMap';
 import LoadingInfo from "../geo-tiff-layer/LoadingInfo";
 import MapLoadingToast from "./MapLoadingToast";
+import MapSearch from "./MapSearch";
 import { LayerLoadEntry } from "../tree-menu/Layout";
 import HardRefreshButton from "./HardRefreshButton";
 
@@ -28,7 +29,7 @@ interface MapViewProps {
   aquaductLayerData?: any;
   activeView?: string;
   selectedSector?: string;
-  selectedClient?: string;
+  selectedClient?: string[];
   layerLoadStatus?: LayerLoadEntry[];
 }
 
@@ -174,7 +175,7 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
           {/* REMOVE DEFAULT OSM TILE LAYER: Do not add any <TileLayer ...> here! */}
           <RenderGeoLayer onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
           <LoadingInfo loaded={loadedCount} total={totalCount} />
-          {(activeView === 'scbsitesNatureAssetView' || (selectedSector && selectedClient)) && (
+          {(activeView === 'scbsitesNatureAssetView' || (selectedSector && ((selectedClient?.length ?? 0) > 0))) && (
             <GeoJsonLayer
               pointLayerData={pointLayerData ?? null}
               polygonLayerData={proximityLayerData ?? null}
@@ -184,6 +185,7 @@ const MapView = forwardRef<any, MapViewProps>(({ assetsName, selectedLayer, poin
           <GlobioTileMap onTileLoad={setLoadedCount} onTileTotal={setTotalCount} />
           <RenderNCLayer year={2022} onTileLoad={setNcLoadedCount} onTileTotal={setNcTotalCount} />
         </MapContainer>
+        <MapSearch mapRef={mapRef} />
         <MapLoadingToast />
         <HardRefreshButton />
         <LoadingInfo loaded={ncLoadedCount} total={ncTotalCount} />

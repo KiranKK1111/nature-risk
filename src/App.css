@@ -5,6 +5,35 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* Thin scrollbars for MUI Autocomplete / Select dropdowns */
+.MuiAutocomplete-listbox::-webkit-scrollbar,
+.MuiMenu-list::-webkit-scrollbar,
+.MuiPaper-root .MuiList-root::-webkit-scrollbar {
+  width: 4px;
+}
+.MuiAutocomplete-listbox::-webkit-scrollbar-track,
+.MuiMenu-list::-webkit-scrollbar-track,
+.MuiPaper-root .MuiList-root::-webkit-scrollbar-track {
+  background: transparent;
+}
+.MuiAutocomplete-listbox::-webkit-scrollbar-thumb,
+.MuiMenu-list::-webkit-scrollbar-thumb,
+.MuiPaper-root .MuiList-root::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
+.MuiAutocomplete-listbox::-webkit-scrollbar-thumb:hover,
+.MuiMenu-list::-webkit-scrollbar-thumb:hover,
+.MuiPaper-root .MuiList-root::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+.MuiAutocomplete-listbox,
+.MuiMenu-list,
+.MuiPaper-root .MuiList-root {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.18) transparent;
+}
+
 .app-container {
   display: flex;
   flex-direction: row;
@@ -174,31 +203,32 @@ html, body, #root {
 /* ── Marker Popup ────────────────────────────────────── */
 .marker-popup-card {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
   font-family: 'Segoe UI', 'Roboto', 'Inter', 'Arial', sans-serif;
   position: relative;
+  min-width: 150px;
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 8px 28px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06),
     0 0 0 1px rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(8px);
 }
 
 /* Header */
 .marker-popup-header {
-  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
-  padding: 11px 16px;
-  padding-right: 36px;
+  padding: 6px 10px;
+  padding-right: 26px;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 6px;
+  position: relative;
 }
 .marker-popup-header-icon {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   background: rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -206,29 +236,27 @@ html, body, #root {
 }
 .marker-popup-header-title {
   color: #fff;
-  font-size: 13.5px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Close button */
 .marker-popup-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.55);
   line-height: 1;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.15s ease;
   z-index: 1;
   border: none;
@@ -241,13 +269,14 @@ html, body, #root {
 
 /* Content rows */
 .marker-popup-body {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 .marker-popup-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 7px 16px;
+  padding: 4px 10px;
+  gap: 12px;
   transition: background 0.12s ease;
 }
 .marker-popup-row:hover {
@@ -258,30 +287,27 @@ html, body, #root {
 }
 .marker-popup-label {
   color: #6b7b8d;
-  font-size: 11.5px;
+  font-size: 9.5px;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
 .marker-popup-value {
   color: #1a2332;
-  font-size: 12.5px;
+  font-size: 10px;
   font-weight: 600;
   text-align: right;
-  max-width: 58%;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* Coordinate values */
 .marker-popup-value--coord {
   font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 500;
   color: #37474f;
   background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 5px;
+  border-radius: 3px;
 }
 
 /* Marker highlight */
@@ -340,4 +366,40 @@ html, body, #root {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* Breach row */
+.marker-popup-row--breach {
+  background: rgba(183, 28, 28, 0.04) !important;
+  border-top: 1px solid rgba(183, 28, 28, 0.18) !important;
+}
+.marker-popup-row--breach .marker-popup-label {
+  color: #c62828;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 8.5px;
+  letter-spacing: 0.5px;
+}
+.marker-popup-value--breach {
+  color: #b71c1c !important;
+  font-size: 9.5px !important;
+  white-space: normal !important;
+  text-align: right;
+  max-width: 145px;
+  line-height: 1.35;
+}
+
+/* Breach loading spinner */
+.breach-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(183, 28, 28, 0.2);
+  border-top-color: #c62828;
+  border-radius: 50%;
+  animation: breach-spin 0.6s linear infinite;
+}
+
+@keyframes breach-spin {
+  to { transform: rotate(360deg); }
 }

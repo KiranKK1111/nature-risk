@@ -1,5 +1,9 @@
 import L from "leaflet";
 import type { TileInfo } from "./TileManager";
+import { getCachedBlob, setCachedBlob } from "../../services/indexedDBCache";
+
+// Shared blob cache across instances — survives component re-mounts
+const gfcBlobCache: { [url: string]: string } = {};
 
 /**
  * ForestLossPNGLayer
@@ -29,7 +33,6 @@ export class ForestLossPNGLayer extends L.LayerGroup {
   private activeTiles: Map<string, L.ImageOverlay> = new Map();
   private loadingTiles: Set<string> = new Set();
   private map?: L.Map;
-  private imageCache: Map<string, string> = new Map(); // url -> objectURL or original url
   private onTileLoad?: (loaded: number) => void;
   private onTileTotal?: (total: number) => void;
   private loadedTiles: number = 0;
@@ -159,22 +162,28 @@ export class ForestLossPNGLayer extends L.LayerGroup {
         if (!this.loadingTiles.has(tile.key)) continue;
 
         try {
-          // Load image into browser cache if not already cached
-          if (!this.imageCache.has(tile.key)) {
-            const img = new Image();
-            img.src = tile.info.url;
-            await new Promise<void>((resolve, reject) => {
-              img.onload = () => resolve();
-              img.onerror = () => reject();
-            });
-            this.imageCache.set(tile.key, tile.info.url);
+          // 3-tier cache: memory → IndexedDB → network
+          let objectUrl = gfcBlobCache[tile.info.url];
+          if (!objectUrl) {
+            const cacheKey = `gfc:${tile.info.url}`;
+            const cachedBlob = await getCachedBlob(cacheKey);
+            if (cachedBlob) {
+              objectUrl = URL.createObjectURL(cachedBlob);
+            } else {
+              // tile.info.url is already a full backend URL (built by FileDiscovery)
+              const resp = await fetch(tile.info.url);
+              const blob = await resp.blob();
+              objectUrl = URL.createObjectURL(blob);
+              setCachedBlob(cacheKey, blob);
+            }
+            gfcBlobCache[tile.info.url] = objectUrl;
           }
 
           if (generation !== this.loadGeneration) return;
           if (!this.loadingTiles.has(tile.key)) continue;
           if (!this.map) return;
 
-          const overlay = L.imageOverlay(tile.info.url, tile.bounds, {
+          const overlay = L.imageOverlay(objectUrl, tile.bounds, {
             opacity: 1,
             interactive: false,
             className: 'png-black-bg',

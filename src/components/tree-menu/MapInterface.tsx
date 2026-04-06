@@ -13,7 +13,7 @@ import { LayerLoadEntry } from './Layout';
 interface MapInterfaceProps {
     activeView?: string;
     selectedSector?: string;
-    selectedClient?: string;
+    selectedClient?: string[];
     showTable?: boolean;
     setActiveView?: (view: 'clientsNatureAssetView' | 'scbsitesNatureAssetView') => void;
     mapViewRef?: React.Ref<any>;
@@ -40,7 +40,7 @@ export const MapInterface: React.FC<MapInterfaceProps> = ({
     return (
         <Box sx={{ flex: 1, minWidth: 0, position: 'relative', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
             {/* View Toggle Buttons */}
-            {!showTable && selectedSector && selectedClient ? (<Box
+            {!showTable && selectedSector && ((selectedClient?.length ?? 0) > 0) ? (<Box
                 sx={{
                     position: 'absolute',
                     top: 16,
@@ -100,7 +100,7 @@ export const MapInterface: React.FC<MapInterfaceProps> = ({
                         selectedLayer={selectedOption}
                         pointLayerData={
                             activeView === 'clientsNatureAssetView'
-                                ? (selectedSector && selectedClient ? layers.pointLayerForClientAsset?.data : null)
+                                ? (selectedSector && ((selectedClient?.length ?? 0) > 0) ? layers.pointLayerForClientAsset?.data : null)
                                 : layers.pointLayerForSCBAsset?.data
                         }
                         proximityLayerData={proximityLayerData}
@@ -114,7 +114,7 @@ export const MapInterface: React.FC<MapInterfaceProps> = ({
             }
 
             {/* MenuItems positioned below view toggle buttons */}
-            {!showTable && selectedSector && selectedClient && activeView === 'clientsNatureAssetView' && (
+            {!showTable && selectedSector && ((selectedClient?.length ?? 0) > 0) && activeView === 'clientsNatureAssetView' && (
                 <Box
                     sx={{
                         position: 'absolute',

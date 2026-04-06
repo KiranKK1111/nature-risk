@@ -12,13 +12,13 @@ export interface TooltipContentProps {
 
 export const CustomToolTipContent: TooltipContentProps[] = [
     { subject: 'Aerosol', tooltip: 'The concentration of fine particles in the atmosphere, which can affect climate and human health. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Stratospheric ozone', tooltip: 'The depletion of the ozone layer in the stratosphere, which can affect climate and human health. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Ocean acidification', tooltip: 'The decrease in pH of the Earth\'s oceans, caused by the uptake of carbon dioxide from the atmosphere. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Landsystem change', tooltip: 'The alteration of land use and land cover, which can affect biodiversity and ecosystem services. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Freshwater use', tooltip: 'The consumption of freshwater resources, which can affect ecosystem health and human well-being. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Climate change', tooltip: 'The long-term alteration of temperature and typical weather patterns in a place, which can affect ecosystems and human societies. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Biosphere integrity', tooltip: 'The loss of biodiversity and ecosystem function, which can affect the resilience of ecosystems and the services they provide. The boundary is regionally specified and currently only tentatively quantified.' },
-    { subject: 'Biogeochemical flows', tooltip: 'The disruption of natural cycles of essential elements, which can affect ecosystem function and human well-being. The boundary is regionally specified and currently only tentatively quantified.' },
+    { subject: 'Stratospheric ozone', tooltip: 'The thinning of the ozone layer in the stratosphere, which protects us from harmful ultraviolet radiation. This boundary is considered to be within the safe operating space due to international agreements like the Montreal Protocol.' },
+    { subject: 'Ocean acidification', tooltip: 'The ongoing decrease in the pH of the Earth\’s oceans, caused by the absorption of carbon dioxide from the atmosphere. The boundary is measured by the mean saturation state of aragonite in surface seawater.' },
+    { subject: 'Landsystem change', tooltip: 'The conversion of natural ecosystems, like forests and grasslands, to other land uses such as agriculture and urban areas. The boundary is measured by the percentage of global forest cover remaining.' },
+    { subject: 'Freshwater use', tooltip: 'The amount of freshwater extracted from rivers, lakes, and aquifers for human use. The boundary is defined by the amount of blue water used in river basins.' },
+    { subject: 'Climate change', tooltip: 'The increase in global average temperature and changes in weather patterns due to greenhouse gas emissions. The boundary is defined by atmospheric carbon dioxide concentration and radiative forcing.' },
+    { subject: 'Biosphere integrity', tooltip: 'This encompasses the decline in biodiversity, measured by genetic diversity and functional diversity.' },
+    { subject: 'Biogeochemical flows', tooltip: 'These cycles are disrupted by excessive use of fertilizers, leading to pollution of water and air. The boundaries are defined by industrial and agricultural inputs of nitrogen and phosphorus to the biosphere and oceans.' },
 ]
 
 // Direct Exposure Data
