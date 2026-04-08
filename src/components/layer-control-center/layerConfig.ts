@@ -146,6 +146,7 @@ export const layerSections: LayerSectionConfig[] = [
   {
     sectionKey: 'freshWaterUse',
     title: 'B. Fresh water use',
+    oneCheckBoxAtATime: true,
     checkboxes: [
       {
         key: 'waterBasslineStress',
@@ -167,6 +168,7 @@ export const layerSections: LayerSectionConfig[] = [
   {
     sectionKey: 'aerosol',
     title: 'C. Aerosol',
+    oneCheckBoxAtATime: true,
     checkboxes: [
       {
         key: 'edgar_pm25',

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress } from '@mui/material';
 import {
   RadarChart,
   PolarGrid,
@@ -10,30 +10,69 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { CustomToolTipContent, HeatmapDataDirect, HeatmapDataIndirect, radarChartConfig } from './radar-data';
-import { PlanetaryBoundaryData } from './table-data';
-import { getAssetUrl } from '../../utils/publicPath';
+import { RadarDataItem, radarChartConfig } from './radar-data';
+import { PlanetaryBoundaryRow } from './table-data';
 import { CustomAngleTick } from './CustomAngleTick';
-// import { CustomAngleTick } from './CustomAngleTick';
+// @ts-ignore — dataService is a .jsx file; TS can't resolve exports at design time
+import { fetchRadarData, fetchPlanetaryBoundaries } from '../../services/dataService';
 
 type Category = 'PRESSURES' | 'DEPENDENCIES' | 'OVERALL';
 type ExposureType = 'direct' | 'indirect';
 type ViewType = 'radar' | 'table';
 
-export const ChartView: React.FC = () => {
+interface ChartViewProps {
+  selectedClient?: string;
+  selectedSector?: string;
+}
+
+export const ChartView: React.FC<ChartViewProps> = ({ selectedClient }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category>('OVERALL');
   const [selectedExposure, setSelectedExposure] = useState<ExposureType>('indirect');
   const [selectedView, setSelectedView] = useState<ViewType>('radar');
+  const [apiRadarData, setApiRadarData] = useState<RadarDataItem[] | null>(null);
+  const [apiPBData, setApiPBData] = useState<PlanetaryBoundaryRow[] | null>(null);
+
+  // Fetch radar data from API
+  useEffect(() => {
+    if (!selectedClient) return;
+    const controller = new AbortController();
+    fetchRadarData(selectedClient, controller.signal)
+      .then((data: RadarDataItem[]) => setApiRadarData(data))
+      .catch((err: any) => { if (err?.name !== 'CanceledError') console.error('Failed to load radar data:', err); });
+    return () => controller.abort();
+  }, [selectedClient]);
+
+  // Fetch planetary boundaries for table view
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchPlanetaryBoundaries(controller.signal)
+      .then((data: PlanetaryBoundaryRow[]) => setApiPBData(data))
+      .catch((err: any) => { if (err?.name !== 'CanceledError') console.error('Failed to load PB data:', err); });
+    return () => controller.abort();
+  }, []);
+
+  // Filter API data by exposure type
+  const directData = apiRadarData?.filter((d: RadarDataItem) => d.exposureType === 'direct') || [];
+  const indirectData = apiRadarData?.filter((d: RadarDataItem) => d.exposureType === 'indirect') || [];
+  const pbData = apiPBData || [];
 
   // Get the appropriate data based on selections
-  const dataSource = selectedExposure === 'direct' ? HeatmapDataDirect : HeatmapDataIndirect;
-  const selectedData = dataSource.find(item => item.category === selectedCategory);
+  const dataSource = selectedExposure === 'direct' ? directData : indirectData;
+  const selectedData = dataSource.find((item: RadarDataItem) => item.category === selectedCategory);
   const chartData = selectedData?.data || [];
 
   // Update subtitle based on exposure type
-  const subtitle = selectedExposure === 'direct' 
+  const subtitle = selectedExposure === 'direct'
     ? 'Direct exposure levels (%)'
     : 'Indirect exposure levels (%)';
+
+  if (!apiRadarData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 2 }}>
@@ -180,7 +219,7 @@ export const ChartView: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {PlanetaryBoundaryData.map((row, rowIndex) => {
+                {pbData.map((row: PlanetaryBoundaryRow, rowIndex: number) => {
                   const maxRows = Math.max(row.pressures.length, row.dependencies.length);
                   
                   return Array.from({ length: maxRows }).map((_, subRowIndex) => {

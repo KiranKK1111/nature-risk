@@ -1,8 +1,10 @@
-import React, { useState, useRef, useMemo, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { Box, Typography, Paper, Button, ButtonGroup, IconButton, Menu, MenuItem, CircularProgress } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { ResponsiveHeatMap } from '@nivo/heatmap';
-import { HeatmapData } from './heatmap-data';
+import { HeatmapDataItem } from './heatmap-data';
+// @ts-ignore — dataService is a .jsx file
+import { fetchHeatmapData } from '../../services/dataService';
 
 // Helper function to return complete labels without truncation
 const formatLabel = (label: string): string => {
@@ -13,12 +15,12 @@ const formatLabel = (label: string): string => {
 const allowedValues = [0, 0.1, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 
 // Transform data for Nivo HeatMap
-const transformDataForNivo = (dataItem: typeof HeatmapData[0]) => {
-  return dataItem.companies.map(company => {
+const transformDataForNivo = (dataItem: HeatmapDataItem) => {
+  return dataItem.companies.map((company: string) => {
     const companyValues = dataItem.values[company];
     return {
       id: company,
-      data: dataItem.riskCategories.map((category, index) => ({
+      data: dataItem.riskCategories.map((category: string, index: number) => ({
         x: category,
         y: companyValues[index]
       }))
@@ -42,17 +44,6 @@ const getColor = (value: number): string => {
   };
   
   return colorMap[value] || '#CCCCCC'; // Default gray for unexpected values
-};
-
-// Get current heatmap configuration based on view type
-const getHeatmapConfig = (viewType: 'pressures' | 'dependencies') => {
-  const config = HeatmapData.find(item => 
-    item.category === viewType.toUpperCase() as 'PRESSURES' | 'DEPENDENCIES'
-  );
-  if (!config) {
-    throw new Error(`Configuration for ${viewType} not found`);
-  }
-  return config;
 };
 
 // Export to CSV function
@@ -127,15 +118,43 @@ const exportToPDF = async (element: HTMLElement | null, viewType: string) => {
   }
 };
 
-export const HeatmapView: React.FC = () => {
+interface HeatmapViewProps {
+  selectedClient?: string;
+  selectedSector?: string;
+}
+
+export const HeatmapView: React.FC<HeatmapViewProps> = ({ selectedClient }) => {
   const [viewType, setViewType] = useState<'pressures' | 'dependencies'>('pressures');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiData, setApiData] = useState<HeatmapDataItem[] | null>(null);
   const heatmapRef = useRef<HTMLDivElement>(null);
-  
+
+  // Fetch from API when selectedClient changes
+  useEffect(() => {
+    if (!selectedClient) return;
+    const controller = new AbortController();
+    setIsLoading(true);
+    fetchHeatmapData(selectedClient, controller.signal)
+      .then((data: HeatmapDataItem[]) => setApiData(data))
+      .catch((err: any) => {
+        if (err?.name !== 'CanceledError') {
+          console.error('Failed to load heatmap data:', err);
+        }
+      })
+      .finally(() => setIsLoading(false));
+    return () => controller.abort();
+  }, [selectedClient]);
+
   // Get current configuration and data
-  const currentConfig = useMemo(() => getHeatmapConfig(viewType), [viewType]);
-  const heatmapData = useMemo(() => transformDataForNivo(currentConfig), [currentConfig]);
+  const currentConfig = useMemo(() => {
+    if (!apiData) return null;
+    const config = apiData.find((item: HeatmapDataItem) =>
+      item.category === viewType.toUpperCase() as 'PRESSURES' | 'DEPENDENCIES'
+    );
+    return config || apiData[0] || null;
+  }, [viewType, apiData]);
+  const heatmapData = useMemo(() => currentConfig ? transformDataForNivo(currentConfig) : [], [currentConfig]);
   
   // Memoize handlers
   const handleViewTypeChange = useCallback((newViewType: 'pressures' | 'dependencies') => {
@@ -162,6 +181,7 @@ export const HeatmapView: React.FC = () => {
   };
 
   const handleExportCSV = () => {
+    if (!currentConfig) return;
     exportToCSV(heatmapData, currentConfig.riskCategories, viewType);
     handleDownloadClose();
   };
@@ -170,6 +190,14 @@ export const HeatmapView: React.FC = () => {
     exportToPDF(heatmapRef.current, viewType);
     handleDownloadClose();
   };
+
+  if (!currentConfig || !apiData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 2 }}>

@@ -126,7 +126,7 @@ export const MapInterface: React.FC<MapInterfaceProps> = ({
                         zIndex: 999,
                     }}
                 >
-                    <MenuItems />
+                    <MenuItems selectedClient={selectedClient} selectedSector={selectedSector} />
                 </Box>
             )}
         </Box>

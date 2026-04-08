@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,7 +12,10 @@ import {
   Button,
   ButtonGroup,
   Chip,
+  CircularProgress,
 } from '@mui/material';
+// @ts-ignore — dataService is a .jsx file
+import { fetchGridData } from '../../services/dataService';
 
 interface GridDataRow {
   company: string;
@@ -22,44 +25,41 @@ interface GridDataRow {
   level: string;
 }
 
-const gridData: GridDataRow[] = [
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Aerosol", exposure: 22.5, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Aerosol", exposure: 28.0, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Biogeochemical flows", exposure: 31.1, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Biogeochemical flows", exposure: 57.1, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Biosphere integrity", exposure: 38.1, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Biosphere integrity", exposure: 53.9, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Climate change", exposure: 31.3, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Climate change", exposure: 0, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Freshwater use", exposure: 62.7, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Freshwater use", exposure: 35.3, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Landsystem change", exposure: 13.0, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Landsystem change", exposure: 22.9, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Ocean acidification", exposure: 11.1, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Ocean acidification", exposure: 11.9, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Stratospheric ozone", exposure: 0, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Stratospheric ozone", exposure: 0, level: "direct" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Aerosol", exposure: 23.1, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Aerosol", exposure: 28.0, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Biogeochemical flows", exposure: 57.6, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Biogeochemical flows", exposure: 57.1, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Biosphere integrity", exposure: 48.2, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Biosphere integrity", exposure: 53.9, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Climate change", exposure: 56.8, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Climate change", exposure: 0, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Freshwater use", exposure: 72.9, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Freshwater use", exposure: 35.3, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Landsystem change", exposure: 56.6, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Landsystem change", exposure: 22.9, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Ocean acidification", exposure: 13.7, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Ocean acidification", exposure: 11.9, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Dependency", variable: "Stratospheric ozone", exposure: 0, level: "indirect" },
-  { company: "GLENCORE GROUP", category: "Pressure", variable: "Stratospheric ozone", exposure: 0, level: "indirect" },
-];
 
-export const GridView: React.FC = () => {
+interface GridViewProps {
+  selectedClient?: string;
+  selectedSector?: string;
+}
+
+export const GridView: React.FC<GridViewProps> = ({ selectedClient }) => {
   const [selectedLevel, setSelectedLevel] = useState<'direct' | 'indirect' | 'all'>('all');
   const [selectedCategory, setSelectedCategory] = useState<'Dependency' | 'Pressure' | 'all'>('all');
+  const [apiData, setApiData] = useState<GridDataRow[] | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch from API when selectedClient changes
+  useEffect(() => {
+    if (!selectedClient) return;
+    const controller = new AbortController();
+    setLoading(true);
+    fetchGridData(selectedClient, controller.signal)
+      .then((data: GridDataRow[]) => setApiData(data))
+      .catch((err: any) => {
+        if (err?.name !== 'CanceledError') console.error('Failed to load grid data:', err);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [selectedClient]);
+
+  const gridData = apiData || [];
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   // Filter data based on selections
   const filteredData = gridData.filter(row => {

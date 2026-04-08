@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Box,
     Typography,
@@ -12,24 +12,13 @@ import {
     TextField,
     Chip,
     Checkbox,
+    CircularProgress,
 } from '@mui/material';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import './Layout.css';
 import ControlCenter from '../layer-control-center/ControlCenter';
-
-const CLIENT_OPTIONS = [
-    'Glencore',
-    'BHP Group',
-    'Rio Tinto',
-    'Vale S.A.',
-    'Anglo American',
-    'Freeport-McMoRan',
-    'Teck Resources',
-    'Newmont Corporation',
-    'Barrick Gold',
-    'South32',
-];
+import { fetchSectors, fetchGroups, fetchClients } from '../../services/dataService';
 
 interface SidebarProps {
     sidebarCollapsed: boolean;
@@ -62,6 +51,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setSelectedGroup,
     setSelectedClient
 }: SidebarProps) => {
+    // Dynamic data from API
+    const [sectors, setSectors] = useState<{ name: string; description: string }[]>([]);
+    const [groups, setGroups] = useState<{ name: string; display_name: string }[]>([]);
+    const [clients, setClients] = useState<{ name: string; display_name: string }[]>([]);
+    const [loadingSectors, setLoadingSectors] = useState(true);
+    const [loadingGroups, setLoadingGroups] = useState(false);
+    const [loadingClients, setLoadingClients] = useState(false);
+
+    // Fetch sectors on mount
+    useEffect(() => {
+        const controller = new AbortController();
+        fetchSectors(controller.signal)
+            .then(data => setSectors(data))
+            .catch(err => { if (err?.name !== 'CanceledError') console.error('Failed to load sectors:', err); })
+            .finally(() => setLoadingSectors(false));
+        return () => controller.abort();
+    }, []);
+
+    // Fetch groups when sector changes
+    useEffect(() => {
+        if (!selectedSector) { setGroups([]); return; }
+        setLoadingGroups(true);
+        setGroups([]);
+        if (setSelectedGroup) setSelectedGroup('');
+        if (setSelectedClient) setSelectedClient([]);
+        const controller = new AbortController();
+        fetchGroups(selectedSector, controller.signal)
+            .then(data => setGroups(data))
+            .catch(err => { if (err?.name !== 'CanceledError') console.error('Failed to load groups:', err); })
+            .finally(() => setLoadingGroups(false));
+        return () => controller.abort();
+    }, [selectedSector]);
+
+    // Fetch clients when group changes
+    useEffect(() => {
+        if (!selectedGroup) { setClients([]); return; }
+        setLoadingClients(true);
+        setClients([]);
+        if (setSelectedClient) setSelectedClient([]);
+        const controller = new AbortController();
+        fetchClients(selectedGroup, controller.signal)
+            .then(data => setClients(data))
+            .catch(err => { if (err?.name !== 'CanceledError') console.error('Failed to load clients:', err); })
+            .finally(() => setLoadingClients(false));
+        return () => controller.abort();
+    }, [selectedGroup]);
+
     return (
         <Box
             sx={{
@@ -205,8 +241,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     value={selectedSector}
                                     onChange={(e) => setSelectedSector && setSelectedSector(e.target.value)}
                                     renderValue={selected => selected ? selected : 'Select Sector'}
+                                    disabled={loadingSectors}
                                 >
-                                    <MenuItem value="Metals & Minings">Metals & Minings</MenuItem>
+                                    {loadingSectors ? (
+                                        <MenuItem disabled><CircularProgress size={16} sx={{ mr: 1 }} /> Loading...</MenuItem>
+                                    ) : (
+                                        sectors.map(s => (
+                                            <MenuItem key={s.name} value={s.name}>{s.name}</MenuItem>
+                                        ))
+                                    )}
                                 </Select>
 
                                 {selectedSector && (
@@ -217,8 +260,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         value={selectedGroup}
                                         onChange={(e) => setSelectedGroup && setSelectedGroup(e.target.value)}
                                         renderValue={selected => selected ? selected : 'Select Group'}
+                                        disabled={loadingGroups}
                                     >
-                                        <MenuItem value="Group A">Group A</MenuItem>
+                                        {loadingGroups ? (
+                                            <MenuItem disabled><CircularProgress size={16} sx={{ mr: 1 }} /> Loading...</MenuItem>
+                                        ) : (
+                                            groups.map(g => (
+                                                <MenuItem key={g.name} value={g.name}>{g.display_name}</MenuItem>
+                                            ))
+                                        )}
                                     </Select>
                                 )}
                             </Box>
@@ -228,9 +278,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 <Autocomplete
                                     multiple
                                     size="small"
-                                    options={CLIENT_OPTIONS}
+                                    options={clients.map(c => c.display_name)}
                                     value={selectedClient || []}
                                     onChange={(_e, newValue) => setSelectedClient && setSelectedClient(newValue)}
+                                    loading={loadingClients}
                                     disableCloseOnSelect
                                     renderOption={(props, option, { selected }) => (
                                         <li {...props} style={{ ...props.style, padding: '2px 8px', fontSize: 12 }}>
@@ -257,6 +308,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                             {...params}
                                             placeholder={selectedClient?.length ? '' : 'Search Client...'}
                                             sx={{ '& .MuiInputBase-root': { fontSize: 12, py: '2px' } }}
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                endAdornment: (
+                                                    <>
+                                                        {loadingClients ? <CircularProgress size={16} /> : null}
+                                                        {params.InputProps.endAdornment}
+                                                    </>
+                                                ),
+                                            }}
                                         />
                                     )}
                                     sx={{ width: '100%' }}

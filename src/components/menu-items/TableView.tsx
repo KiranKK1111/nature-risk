@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -9,17 +9,51 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  CircularProgress,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import { NatureTableData } from './table-data';
+import { NatureTableRow } from './table-data';
+// @ts-ignore — dataService is a .jsx file
+import { fetchNatureThematics } from '../../services/dataService';
 
-export const TableView: React.FC = () => {
+interface TableViewProps {
+  selectedClient?: string;
+  selectedSector?: string;
+}
+
+export const TableView: React.FC<TableViewProps> = ({ selectedSector }) => {
+  const [apiData, setApiData] = useState<NatureTableRow[] | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch nature thematics from API (per sector)
+  useEffect(() => {
+    if (!selectedSector) return;
+    const controller = new AbortController();
+    setLoading(true);
+    fetchNatureThematics(selectedSector, controller.signal)
+      .then((data: NatureTableRow[]) => setApiData(data))
+      .catch((err: any) => {
+        if (err?.name !== 'CanceledError') console.error('Failed to load nature thematics:', err);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [selectedSector]);
+
+  const tableData = apiData || [];
+
+  if (loading || !apiData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   let currentCategory = '';
-  let categoryRowSpan = 0;
   const categorySpans = new Map<string, number>();
 
   // Calculate rowspan for each category
-  NatureTableData.forEach((row) => {
+  tableData.forEach((row: NatureTableRow) => {
     categorySpans.set(row.category, (categorySpans.get(row.category) || 0) + 1);
   });
 
@@ -120,11 +154,10 @@ export const TableView: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {NatureTableData.map((row, index) => {
+            {tableData.map((row: NatureTableRow, index: number) => {
               const isNewCategory = row.category !== currentCategory;
               if (isNewCategory) {
                 currentCategory = row.category;
-                categoryRowSpan = categorySpans.get(row.category) || 1;
               }
 
               return (

@@ -26,7 +26,12 @@ import { GridView } from './GridView';
 
 type ViewType = 'chart' | 'heatmap' | 'table' | 'grid' | null;
 
-function MenuItems() {
+interface MenuItemsProps {
+  selectedClient?: string[];
+  selectedSector?: string;
+}
+
+function MenuItems({ selectedClient, selectedSector }: MenuItemsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState<ViewType>(null);
 
@@ -41,6 +46,10 @@ function MenuItems() {
   const closeView = () => {
     setActiveView(null);
   };
+
+  // Resolve the client API name from the display name
+  // The first selected client is used for per-client data
+  const activeClientDisplay = selectedClient && selectedClient.length > 0 ? selectedClient[0] : undefined;
 
   const menuItems = [
     { id: 'chart', icon: <BarChart />, label: 'Overall results', component: ChartView },
@@ -196,7 +205,7 @@ function MenuItems() {
             </MuiIconButton>
           </DialogTitle>
           <DialogContent sx={{ p: 3 }}>
-            {activeView === item.id && <item.component />}
+            {activeView === item.id && <item.component selectedClient={activeClientDisplay} selectedSector={selectedSector} />}
           </DialogContent>
         </Dialog>
       ))}

@@ -74,14 +74,14 @@ export default function ControlCenter(): JSX.Element {
         ) {
             layerSections.forEach(section => {
                 section.checkboxes.forEach(subConfig => {
-                    if (!(section.sectionKey === sectionForConfig.sectionKey && subConfig.key === config.key)) {
+                    if (!(section.sectionKey === sectionForConfig!.sectionKey && subConfig.key === config!.key)) {
                         dispatch(setLayerVisibility(subConfig.stateKey, false));
                     }
                 });
                 // Also disable mainCheck if present and not the current config
                 if (
                     section.mainCheck &&
-                    !(section.sectionKey === sectionForConfig.sectionKey && section.mainCheck.key === config.key)
+                    !(section.sectionKey === sectionForConfig!.sectionKey && section.mainCheck.key === config!.key)
                 ) {
                     dispatch(setLayerVisibility(section.mainCheck.stateKey, false));
                 }
@@ -180,7 +180,7 @@ export default function ControlCenter(): JSX.Element {
         ) {
             // If enabling 'tree cover loss', disable all except itself
             sectionForConfig.checkboxes.forEach(subConfig => {
-                if (subConfig.key !== config.key) {
+                if (subConfig.key !== config!.key) {
                     dispatch(setLayerVisibility(subConfig.stateKey, false));
                 }
             });
